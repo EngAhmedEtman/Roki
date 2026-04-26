@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Designs - تصميم بطاقات مناسبات</title>
 
     <!-- Fonts -->
@@ -195,7 +196,7 @@
                 @forelse($designs as $design)
                 @php $imgUrl = $design->image ? Storage::url($design->image) : null; @endphp
                 <!-- Card (clickable) -->
-                <div onclick="openCardModal('{{ addslashes($design->title) }}','{{ addslashes($design->subtitle ?? '') }}','{{ $imgUrl }}')"
+                <div onclick="openCardModal({{ $design->id }}, '{{ addslashes($design->title) }}','{{ addslashes($design->subtitle ?? '') }}','{{ $imgUrl }}')"
                     class="bg-brand-light rounded-xl p-3 shadow-sm hover:shadow-lg transition-all group border border-gray-100 cursor-pointer hover:-translate-y-1 duration-300">
                     <div class="relative overflow-hidden rounded-lg mb-3 aspect-[9/16] bg-slate-100">
                         @if($imgUrl)
@@ -311,7 +312,9 @@
         const waNumber  = "{{ $settings['whatsapp_number'] ?? '201234567890' }}";
         const waBaseMsg = "{{ $settings['whatsapp_message'] ?? 'مرحباً، أريد الاستفسار عن تصميم' }}";
 
-        function openCardModal(title, subtitle, imgUrl) {
+        function openCardModal(id, title, subtitle, imgUrl) {
+            trackEvent('design_view', id);
+            
             const modal   = document.getElementById('card-modal');
             const imgEl   = document.getElementById('modal-card-img');
             const noImgEl = document.getElementById('modal-no-img');
@@ -383,7 +386,7 @@
                             : `<div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">بدون صورة</div>`;
 
                         const cardHtml = `
-                            <div onclick="openCardModal('${safeTitle}', '${safeSubtitle}', '${imgUrl || ''}')"
+                            <div onclick="openCardModal(${design.id}, '${safeTitle}', '${safeSubtitle}', '${imgUrl || ''}')"
                                 class="bg-brand-light rounded-xl p-3 shadow-sm hover:shadow-lg transition-all group border border-gray-100 cursor-pointer hover:-translate-y-1 duration-300">
                                 <div class="relative overflow-hidden rounded-lg mb-3 aspect-[9/16] bg-slate-100">
                                     ${imgHtml}
@@ -596,6 +599,38 @@
                     });
                 });
             }
+        });
+    </script>
+    <script>
+        // Analytics Tracking
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        function trackEvent(event, value = null) {
+            fetch('/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ event, value })
+            }).catch(() => {});
+        }
+
+        // Heartbeat every 30 seconds to keep user active
+        setInterval(() => trackEvent('heartbeat'), 30000);
+        trackEvent('page_view');
+
+        // Track section visibility
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    trackEvent('section_view', entry.target.id);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('section[id]').forEach(section => {
+            observer.observe(section);
         });
     </script>
 </body>

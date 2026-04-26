@@ -29,6 +29,9 @@ Route::get('/', function (\Illuminate\Http\Request $request) {
 
 Route::post('/contact', [ContactMessageController::class, 'store'])->name('contact.store');
 
+// API/Tracking
+Route::post('/track', [App\Http\Controllers\Api\AnalyticsController::class, 'track'])->name('track');
+
 // Admin Dashboard Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
