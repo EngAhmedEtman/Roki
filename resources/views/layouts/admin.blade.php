@@ -117,11 +117,18 @@
                 <i data-lucide="settings" class="w-5 h-5"></i>
                 الإعدادات
             </a>
-            <div class="border-t border-slate-700 pt-4 mt-4">
+            <div class="border-t border-slate-700 pt-4 mt-4 space-y-2">
                 <a href="{{ route('home') }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition text-sm">
                     <i data-lucide="external-link" class="w-4 h-4"></i>
                     زيارة الموقع
                 </a>
+                <form method="POST" action="{{ route('logout') }}" id="logout-form-sidebar">
+                    @csrf
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition text-sm">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        تسجيل الخروج
+                    </a>
+                </form>
             </div>
         </nav>
     </aside>
@@ -137,9 +144,18 @@
             </div>
             <div class="hidden md:block"></div>
             <div class="flex items-center gap-3">
-                <span class="text-sm font-medium text-slate-500">مرحباً بك</span>
+                <div class="text-left ml-4">
+                    <p class="text-sm font-bold text-slate-800">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-slate-500">{{ auth()->user()->email }}</p>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="p-2 text-slate-400 hover:text-red-500 transition tooltip" title="تسجيل الخروج">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </form>
                 <div class="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
-                    A
+                    {{ substr(auth()->user()->name, 0, 1) }}
                 </div>
             </div>
         </header>
