@@ -148,10 +148,11 @@
                     <p class="text-sm font-bold text-slate-800">{{ auth()->user()->name }}</p>
                     <p class="text-xs text-slate-500">{{ auth()->user()->email }}</p>
                 </div>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="flex">
                     @csrf
-                    <button type="submit" class="p-2 text-slate-400 hover:text-red-500 transition tooltip" title="تسجيل الخروج">
-                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    <button type="submit" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-bold">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>تسجيل خروج</span>
                     </button>
                 </form>
                 <div class="w-9 h-9 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow">
@@ -168,6 +169,19 @@
 
     <script>
         lucide.createIcons();
+
+        // Mobile Sidebar Toggle
+        const menuBtn = document.querySelector('header button');
+        const sidebar = document.querySelector('aside');
+        
+        if (menuBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('fixed');
+                sidebar.classList.toggle('inset-0');
+                sidebar.classList.toggle('z-50');
+            });
+        }
 
         // =====================
         // Toast Notification System
