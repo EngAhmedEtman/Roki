@@ -2,11 +2,25 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DesignController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\SettingController;
 
+use App\Models\Design;
+use App\Models\Setting;
+
 Route::get('/', function () {
-    return view('welcome');
+    $designs = Design::where('is_active', true)->latest()->paginate(10);
+    $settings = Setting::pluck('value', 'key')->toArray();
+    
+    if (request()->ajax()) {
+        return response()->json([
+            'designs' => $designs->items(),
+            'has_more' => $designs->hasMorePages()
+        ]);
+    }
+
+    return view('welcome', compact('designs', 'settings'));
 })->name('home');
 
 Route::get('/dashboard', function () {
